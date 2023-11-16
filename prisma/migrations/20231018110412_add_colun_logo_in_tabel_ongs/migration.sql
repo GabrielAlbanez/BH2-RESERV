@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `ong` ADD COLUMN `Logo` VARCHAR(191) NULL;

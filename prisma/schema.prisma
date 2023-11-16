@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  cpf              String           @id
+  nome             String
+  email            String           @unique
+  senha            String
+  sexo             String
+  endereco         String
+  rifas            Rifa[]
+  tipo             String?          @default("default")
+  telefone         String
+  numerosComprados NumeroComprado[]
+}
+
+model Ong {
+  cnpj         String        @id
+  nome         String
+  email        String        @unique
+  senha        String
+  telefone     String
+  endereco     String?
+  redesSociais String?
+  aprovado     Boolean?      @default(false)
+  Logo         String?
+  rifas        Rifa[]
+  Voluntarios  Voluntarios[]
+  trabalhos    Trabalho[]
+}
+
+model Voluntarios {
+  cpf   String @id
+  nome  String
+  idOng String
+  ong   Ong    @relation(fields: [idOng], references: [cnpj], onDelete: Cascade)
+}
+
+model Trabalho {
+  id        Int     @id @default(autoincrement())
+  nome      String
+  descricao String?
+  idOng     String
+  ong       Ong     @relation(fields: [idOng], references: [cnpj], onDelete: Cascade)
+}
+
+model Rifa {
+  id             Int              @id @default(autoincrement())
+  imgRifa        String?
+  nome           String
+  preco          Decimal
+  descricao      String?
+  CpfUsuario     String?
+  idOng          String?
+  usuario        Usuario?         @relation(fields: [CpfUsuario], references: [cpf], onDelete: Cascade)
+  ong            Ong?             @relation(fields: [idOng], references: [cnpj], onDelete: Cascade)
+  NumeroComprado NumeroComprado[]
+  sorteado       Boolean?          @default(false)
+  Ganhador       String?          
+
+}
+
+model NumeroComprado {
+  id         Int     @id @default(autoincrement())
+  numero     Int
+  rifaId     Int
+  usuarioCpf String
+  rifa       Rifa    @relation(fields: [rifaId], references: [id], onDelete: Cascade)
+  usuario    Usuario @relation(fields: [usuarioCpf], references: [cpf], onDelete: Cascade)
+}
